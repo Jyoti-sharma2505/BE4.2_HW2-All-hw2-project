@@ -1,4 +1,3 @@
-const { error } = require("console");
 const {initilizationData}=require("./db/db.connect");
 const Hotel=require("./model/hotel.model")
 initilizationData();
@@ -6,38 +5,49 @@ const express = require("express");
 const app=express();
 app.use(express.json());
 
-const newHotel = {
-  name: "Sunset Resort",
-  category: "Resort",
-  location: "12 Main Road, Anytown",
-  rating: 4.0,
-  reviews: [],
-  website: "https://sunset-example.com",
-  phoneNumber: "+1299655890",
-  checkInTime: "2:00 PM",
-  checkOutTime: "11:00 AM",
-  amenities: ["Room Service", "Horse riding", "Boating", "Kids Play Area", "Bar"],
-  priceRange: "$$$$ (61+)",
-  reservationsNeeded: true,
-  isParkingAvailable: true,
-  isWifiAvailable: true,
-  isPoolAvailable: true,
-  isSpaAvailable: true,
-  isRestaurantAvailable: true,
-  photos: ["https://example.com/hotel2-photo1.jpg", "https://example.com/hotel2-photo2.jpg"],
-};
+// const newHotel = {
+//   name: "Sunset Resort",
+//   category: "Resort",
+//   location: "12 Main Road, Anytown",
+//   rating: 4.0,
+//   reviews: [],
+//   website: "https://sunset-example.com",
+//   phoneNumber: "+1299655890",
+//   checkInTime: "2:00 PM",
+//   checkOutTime: "11:00 AM",
+//   amenities: ["Room Service", "Horse riding", "Boating", "Kids Play Area", "Bar"],
+//   priceRange: "$$$$ (61+)",
+//   reservationsNeeded: true,
+//   isParkingAvailable: true,
+//   isWifiAvailable: true,
+//   isPoolAvailable: true,
+//   isSpaAvailable: true,
+//   isRestaurantAvailable: true,
+//   photos: ["https://example.com/hotel2-photo1.jpg", "https://example.com/hotel2-photo2.jpg"],
+// };
 
 async function createHotel(newHotel){
     try{
         const hotel = new Hotel(newHotel);
         const saveHotel= await hotel.save();
-        console.log("New Hotel Data",saveHotel)
+        return saveHotel
 
     }catch(error){
         throw error;
     }
 }
 // createHotel(newHotel)
+
+//LESSON BE: BE4.2_HW2
+app.post("/hotels",async(req,res)=>{
+    try{
+  const savedHotel=await createHotel(req.body);
+  console.log(savedHotel)
+  res.status(200).json({message:"Added Successfully",hotel:savedHotel})
+    }catch(error){
+        res.status(500).json({error:"Failed"})
+    }
+})
 
 //BE2.4_HW2 Question 1:deleteHotelById 
 async function deleteHotelById (hotelId){

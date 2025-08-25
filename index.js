@@ -5,6 +5,15 @@ const express = require("express");
 const app=express();
 app.use(express.json());
 
+
+const cors = require("cors");
+const corsOptions = {
+  origin: "*",
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 // const newHotel = {
 //   name: "Sunset Resort",
 //   category: "Resort",
@@ -53,11 +62,24 @@ app.post("/hotels",async(req,res)=>{
 async function deleteHotelById (hotelId){
     try{
   const deleteById = await Hotel.findByIdAndDelete(hotelId);
+  return deleteById
     }catch(error){
         throw error;
     }
 }
 // deleteHotelById ("689f247009d888d186c7f9ec");
+
+//LESSON BE: BE4.3_HW2
+app.delete("/hotels/:hotelId",async(req,res)=>{
+    try{
+  const deleteId = await deleteHotelById (req.params.hotelId);
+  if(deleteId){
+    res.status(200).json({message:"Delete Successfully"})
+  }
+    }catch(error){
+        res.status(500).json({error:"Failed"})
+    }
+})
 //deleteHotelByPhoneNumber Question :2
 async function deleteHotelByPhoneNumber (hotelPhone){
     try{  
@@ -239,12 +261,26 @@ async function deleteRestaurantById (resturantId){
 async function updateHotel(hotelId,updateValue){
     try{
   const update = await Hotel.findByIdAndUpdate(hotelId,updateValue,{new:true});
-  console.log(update)
+  return update
     }catch(error){
         throw error;
     }
 }
 //  updateHotel("689f247009d888d186c7f9ec",{checkOutTime:"11 Am"})
+
+//LESSON BE: BE4.4_HW2
+app.post("/hotels/:hotelId",async(req,res)=>{
+    try{
+   const update =await updateHotel(req.params.hotelId,req.body);
+   if(update){
+    res.status(200).json({message:"Updated Successfully",update:update})
+   }else{
+    res.status(404).json({error:"Not Found"})
+   }
+    }catch(error){
+        res.status(500).json({error:"Failed"})
+    }
+})
 //Question 2:
 async function updateByName(hotelName,updateRating){
    try{
@@ -266,7 +302,7 @@ async function updatePhone(hotelPhone,updatePhone){
 }
 // updatePhone("+1299655890",{phoneNumber:"+1997687392"})
 
-const PORT = 3000;
+const PORT = process.env.PORT||3000;
 app.listen(PORT,()=>{
     console.log("Server running on port",PORT)
 })
